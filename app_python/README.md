@@ -39,3 +39,15 @@ HOST=<your-value> PORT=<your-value> DEBUG=True python app.py
 | HOST                 | Specifies the host for uvicorn                                                          | `0.0.0.0`     |
 | PORT                 | Specified the launch port for uvicorn                                                   | `5000`        |
 | DEBUG                | Specifies whether to include debug information into responses (currently has no effect) | `False`       |
+
+
+
+
+
+## Docker
+
+Add a Docker section explaining how to use your containerized application. Include command patterns (not exact commands) for:
+
+Building the image locally
+Running a container
+Pulling from Docker Hub
