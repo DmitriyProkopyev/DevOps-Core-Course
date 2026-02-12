@@ -1,10 +1,11 @@
 FROM python:3.14.3-slim
 
+WORKDIR /app
+
 RUN apt-get update && apt-get upgrade -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir --upgrade pip
 
-WORKDIR /app
 RUN useradd --create-home appuser && \
     chown -R appuser:appuser /app
 
