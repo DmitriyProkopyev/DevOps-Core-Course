@@ -1,23 +1,23 @@
 import logging
 import os
-
 import sys
 
 from app_stats import AppStats
 from datetime import datetime, timezone
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import json
 from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 
+
 app = FastAPI()
 app_logger = logging.getLogger("app")
 
 if not app_logger.handlers:
     handler = logging.StreamHandler(sys.stdout)
-    formatter = jsonlogger.JsonFormatter(reserved_attrs=[], timestamp=True)
+    formatter = json.JsonFormatter(reserved_attrs=[], timestamp=True)
     handler.setFormatter(formatter)
     app_logger.addHandler(handler)
 
@@ -32,7 +32,7 @@ app_stats = AppStats(name="devops-info-service",
                      description="DevOps course info service",
                      major_version=1,
                      minor_version=0,
-                     patch_version=0)
+                     patch_version=1)
 
 @app.get("/", description="Service information")
 async def root(request: Request):

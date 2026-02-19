@@ -1,8 +1,9 @@
 import platform
 import socket
+import os
 
 from datetime import datetime, timezone
-from typing import Dict
+from typing import Dict, Any
 
 
 class AppStats:
