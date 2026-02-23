@@ -18,13 +18,13 @@ jobs:
           python-version: '3.12.10'
 
       - name: Install development dependencies
-      - run: |
+        run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements-dev.txt
 
       - name: Run linter
-      - run: ruff check .
+        run: ruff check .
 
       - name: Run unit tests
         run: pytest tests/
