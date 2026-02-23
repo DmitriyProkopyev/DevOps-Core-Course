@@ -4,7 +4,7 @@ This service provides realtime application, system, and networking data relevant
 
 ## Prerequisites
 
-Python `3.12.x+`, FastAPI `0.120.3+`, uvicorn `0.32.0+`, pythonjsonlogger `4.0.0+`.
+Python `3.12.x+`.
 
 ## Installation
 
@@ -39,3 +39,27 @@ HOST=<your-value> PORT=<your-value> DEBUG=True python app.py
 | HOST                 | Specifies the host for uvicorn                                                          | `0.0.0.0`     |
 | PORT                 | Specified the launch port for uvicorn                                                   | `5000`        |
 | DEBUG                | Specifies whether to include debug information into responses (currently has no effect) | `False`       |
+
+
+## Docker
+
+This section provides command patterns for using the application in a containerized manner.
+
+
+To build the image locally, execute this command with substitued values:
+
+```bash
+docker build -t <name>:<x>.<y>.<z> 
+```
+
+To run a container, execute this command with substitued values:
+
+```bash
+docker run -d -p <external-port>:5000 <name>:<x>.<y>.<z> 
+```
+
+To pull the specific version of the image from DockerHub, execute this command with substitued values:
+
+```bash
+docker pull controlw/devops-info-service:<x>.<y>.<z> 
+```
