@@ -1,0 +1,65 @@
+name: lab-testing
+on:
+  push:
+    branches: [ main, lab03 ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.10'
+
+      - name: Install development dependencies
+      - run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements-dev.txt
+
+      - name: Run linter
+      - run: ruff check .
+
+      - name: Run unit tests
+        run: pytest tests/
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          echo "MAJOR_VERSION=$(grep '^MAJOR_VERSION=' version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
+          echo "MINOR_VERSION=$(grep '^MINOR_VERSION=' version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
+          echo "PATCH_VERSION=$(grep '^PATCH_VERSION=' version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            MAJOR_VERSION=${{ steps.version.outputs.MAJOR_VERSION }}
+            MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }}
+            PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
+          tags: |
+            controlw/devops-info-service:${{ steps.version.outputs.MAJOR_VERSION }}.${{ steps.version.outputs.MINOR_VERSION }}.${{ steps.version.outputs.PATCH_VERSION }}
+            controlw/devops-info-service:latest
