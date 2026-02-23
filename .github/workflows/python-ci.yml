@@ -20,7 +20,6 @@ jobs:
       - name: Install development dependencies
         run: |
           python -m venv venv
-          source venv/bin/activate
           pip install -r app_python/requirements-dev.txt
 
       - name: Run linter
