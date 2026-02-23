@@ -21,13 +21,13 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install -r requirements-dev.txt
+          pip install -r app_python/requirements-dev.txt
 
       - name: Run linter
-        run: ruff check .
+        run: ruff check app_python/
 
       - name: Run unit tests
-        run: pytest tests/
+        run: pytest app_python/tests/
 
   release:
     needs: test
@@ -41,9 +41,9 @@ jobs:
       - name: Read version
         id: version
         run: |
-          echo "MAJOR_VERSION=$(grep '^MAJOR_VERSION=' version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
-          echo "MINOR_VERSION=$(grep '^MINOR_VERSION=' version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
-          echo "PATCH_VERSION=$(grep '^PATCH_VERSION=' version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
+          echo "MAJOR_VERSION=$(grep '^MAJOR_VERSION=' app_python/version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
+          echo "MINOR_VERSION=$(grep '^MINOR_VERSION=' app_python/version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
+          echo "PATCH_VERSION=$(grep '^PATCH_VERSION=' app_python/version.env | cut -d '=' -f2-)" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
