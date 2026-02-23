@@ -63,5 +63,5 @@ jobs:
             MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }}
             PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
           tags: |
-            controlw/devops-info-service:${{ steps.version.outputs.MAJOR_VERSION }}.${{ steps.version.outputs.MINOR_VERSION }}.${{ steps.version.outputs.PATCH_VERSION }}
+            controlw/devops-info-service:${{ steps.version.outputs.VERSION }}
             controlw/devops-info-service:latest
