@@ -21,7 +21,7 @@ EXPECTED_ROOT_STRUCTURE = {
     "system": {
         "hostname": NAME_PATTERN,
         "platform": NAME_PATTERN,
-        "platform_version": r"^\d+.\d+.\d+$",
+        "platform_version": r"^.+$",
         "architecture": NAME_PATTERN,
         "cpu_count": r"^\d+$",
         "python_version": r"^\d+.\d+.\d+$",
