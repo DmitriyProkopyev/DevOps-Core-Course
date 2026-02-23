@@ -40,6 +40,8 @@ jobs:
       - name: Read version
         id: version
         run: |
+          set -e
+
           MAJOR_VERSION=$(grep '^MAJOR_VERSION=' app_python/version.env | cut -d '=' -f2-)
           MINOR_VERSION=$(grep '^MINOR_VERSION=' app_python/version.env | cut -d '=' -f2-)
           PATCH_VERSION=$(grep '^PATCH_VERSION=' app_python/version.env | cut -d '=' -f2-)
