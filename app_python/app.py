@@ -15,6 +15,10 @@ from fastapi.responses import JSONResponse
 app = FastAPI()
 app_logger = logging.getLogger("app")
 
+major_version = int(os.environ.get("MAJOR_VERSION", 1))
+minor_version = int(os.environ.get("MINOR_VERSION", 0))
+patch_version = int(os.environ.get("PATCH_VERSION", 0))
+
 if not app_logger.handlers:
     handler = logging.StreamHandler(sys.stdout)
     formatter = json.JsonFormatter(reserved_attrs=[], timestamp=True)
@@ -27,12 +31,12 @@ error_logger = logging.getLogger("app.error")
 request_logger.setLevel(level=logging.INFO)
 error_logger.setLevel(level=logging.ERROR)
 
-
 app_stats = AppStats(name="devops-info-service",
                      description="DevOps course info service",
-                     major_version=1,
-                     minor_version=0,
-                     patch_version=1)
+                     major_version=major_version,
+                     minor_version=minor_version,
+                     patch_version=patch_version)
+
 
 @app.get("/", description="Service information")
 async def root(request: Request):
