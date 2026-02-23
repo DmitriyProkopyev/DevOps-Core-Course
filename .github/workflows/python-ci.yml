@@ -1,9 +1,9 @@
 name: lab-testing
 on:
   push:
-    branches: [ main, lab03 ]
+    branches: [ master, lab03 ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   test:
