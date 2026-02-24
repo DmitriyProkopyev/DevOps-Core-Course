@@ -42,9 +42,9 @@ jobs:
         run: |
           set -e
 
-          MAJOR_VERSION=$(grep '^MAJOR_VERSION=' app_python/version.env | cut -d '=' -f2-)
-          MINOR_VERSION=$(grep '^MINOR_VERSION=' app_python/version.env | cut -d '=' -f2-)
-          PATCH_VERSION=$(grep '^PATCH_VERSION=' app_python/version.env | cut -d '=' -f2-)
+          MAJOR_VERSION=$(grep '^MAJOR_VERSION=' app_python/version.env | cut -d '=' -f2- | tr -d '\r')
+          MINOR_VERSION=$(grep '^MINOR_VERSION=' app_python/version.env | cut -d '=' -f2- | tr -d '\r')
+          PATCH_VERSION=$(grep '^PATCH_VERSION=' app_python/version.env | cut -d '=' -f2- | tr -d '\r')
 
           VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
 
