@@ -26,7 +26,7 @@ with urllib.request.urlopen(req, timeout=4) as resp:
     if resp.status != 200:
         sys.exit(1)
     data = json.loads(resp.read().decode())
-    sys.exit(0 if data.get('status') == 'healthy' else 1)
+    sys.exit(0 if data.get('status') in ('healthy', 'ok') else 1)
 EOF
 RUN chown appuser /app/healthcheck.py
 
