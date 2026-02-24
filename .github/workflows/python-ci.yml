@@ -26,10 +26,10 @@ jobs:
         run: cd app_python && uv sync --dev --locked --no-install-project
 
       - name: Run linter
-        run: ruff check app_python/
+        run: uv run ruff check app_python/
 
       - name: Run unit tests
-        run: pytest app_python/tests/
+        run: uv run pytest app_python/tests/
 
   release:
     needs: test
