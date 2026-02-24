@@ -62,15 +62,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push image
-        run: |
-          docker build \
-          --build-arg MAJOR_VERSION=${{ steps.version.outputs.MAJOR_VERSION }} \
-          --build-arg MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }} \
-          --build-arg PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }} \
-          -t controlw/devops-info-service:${{ steps.version.outputs.VERSION }} \
-          -t controlw/devops-info-service:latest \
-          .
-
-          docker push controlw/devops-info-service:${{ steps.version.outputs.VERSION }}
-          docker push controlw/devops-info-service:latest
-
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            MAJOR_VERSION=${{ steps.version.outputs.MAJOR_VERSION }}
+            MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }}
+            PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
+          tags: >
+            controlw/devops-info-service:${{ steps.version.outputs.VERSION }},
+            controlw/devops-info-service:latest
