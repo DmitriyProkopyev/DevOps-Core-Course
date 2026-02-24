@@ -1,3 +1,5 @@
+[![lab-testing](https://github.com/DmitriyProkopyev/DevOps-Core-Course/actions/workflows/python-ci.yml/badge.svg?branch=master)](https://github.com/DmitriyProkopyev/DevOps-Core-Course/actions/workflows/python-ci.yml)
+
 ## Overview
 
 This service provides realtime application, system, and networking data relevant for training in DevOps practices. The data includes app specifics, OS specifics, runtime stats, request data, and available endpoints listing.
