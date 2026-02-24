@@ -24,15 +24,14 @@ tests/
 
 To run the tests, first navigate to the project root and install the necessary toolset:
 ```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 cd app_python
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements-dev.txt
+uv sync --dev --locked --no-install-project
 ```
 
 Then,  and launch pytest on the entire test set:
 ```bash
-pytest tests/
+uv run pytest tests/
 ```
 
 
@@ -41,3 +40,23 @@ pytest tests/
 Below is a screenshot of all tests passing locally:
 
 ![All tests pass](screenshots/all_tests_pass.png)
+
+
+### Dependency Caching
+
+To assess the build time speedup provided by caching dependencies, I used:
+
+```bash
+time docker build \
+  --build-arg MAJOR_VERSION=1 \
+  --build-arg MINOR_VERSION=0 \
+  --build-arg PATCH_VERSION=2 \
+  -t devops-info-service:test app_python
+```
+
+The result are as following:
+
+| Scenario | Real Time | User Time | System Time | Speedup   |
+| -------- | --------- | --------- | ----------- | --------- |
+| No Cache | 14.955s   | 0.247s    | 0.531s      | Baseline  |
+| Cached   | 2.991s    | 0.176s    | 0.265s      | 5x faster |
