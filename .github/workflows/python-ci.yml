@@ -17,16 +17,19 @@ jobs:
         with:
           python-version: '3.12.10'
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: 0.10.5
+
       - name: Install development dependencies
-        run: |
-          python -m venv venv
-          pip install -r app_python/requirements-dev.txt
+        run: cd app_python && uv sync --dev --locked --no-install-project
 
       - name: Run linter
-        run: ruff check app_python/
+        run: cd app_python && uv run ruff check ./
 
       - name: Run unit tests
-        run: pytest app_python/tests/
+        run: cd app_python && uv run pytest tests/
 
   release:
     needs: test
