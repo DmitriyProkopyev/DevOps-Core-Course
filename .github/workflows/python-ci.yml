@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Get code
@@ -31,15 +31,6 @@ jobs:
       - name: Run unit tests
         run: cd app_python && uv run pytest tests/
 
-  release:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.base_ref == 'master'
-
-    steps:
-      - name: Get code
-        uses: actions/checkout@v4
-
       - name: Read version
         id: version
         run: |
@@ -58,12 +49,6 @@ jobs:
             echo "VERSION=$VERSION"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build image
         id: build
         uses: docker/build-push-action@v6
@@ -76,7 +61,7 @@ jobs:
             PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
           tags: controlw/devops-info-service:${{ steps.version.outputs.VERSION }}
 
-      - name: Scan container with Snyk
+      - name: Scan the image with Snyk
         uses: snyk/actions/docker@v3
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -86,7 +71,36 @@ jobs:
             --severity-threshold=medium
             --fail-on=upgradable
 
-      - name: Push image
+  release:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'master'
+
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          set -e
+          MAJOR_VERSION=$(grep '^MAJOR_VERSION=' app_python/version.env | cut -d '=' -f2- | tr -d '\r')
+          MINOR_VERSION=$(grep '^MINOR_VERSION=' app_python/version.env | cut -d '=' -f2- | tr -d '\r')
+          PATCH_VERSION=$(grep '^PATCH_VERSION=' app_python/version.env | cut -d '=' -f2- | tr -d '\r')
+          VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+          {
+            echo "MAJOR_VERSION=$MAJOR_VERSION"
+            echo "MINOR_VERSION=$MINOR_VERSION"
+            echo "PATCH_VERSION=$PATCH_VERSION"
+            echo "VERSION=$VERSION"
+          } >> "$GITHUB_OUTPUT"
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: app_python
@@ -95,7 +109,6 @@ jobs:
             MAJOR_VERSION=${{ steps.version.outputs.MAJOR_VERSION }}
             MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }}
             PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
-          tags: |
+          tags: >
             controlw/devops-info-service:${{ steps.version.outputs.VERSION }},
             controlw/devops-info-service:latest
-
