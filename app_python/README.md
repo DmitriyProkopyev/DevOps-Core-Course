@@ -12,10 +12,10 @@ Python `3.12.x+`.
 
 ## Installation
 
-```py
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+cd app_python
+uv sync --locked --no-install-project
 ```
 
 ## Running the Application
@@ -47,17 +47,16 @@ HOST=<your-value> PORT=<your-value> DEBUG=True python app.py
 
 ## Testing
 
-To run the tests, first navigate to the project root and install the development dependencies:
+To run the tests, first navigate to the project root and install the necessary toolset:
 ```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 cd app_python
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements-dev.txt
+uv sync --dev --locked --no-install-project
 ```
 
 Then,  and launch pytest on the entire test set:
 ```bash
-pytest tests/
+uv run pytest tests/
 ```
 
 
@@ -86,4 +85,10 @@ To pull the specific version of the image from DockerHub, execute this command w
 
 ```bash
 docker pull controlw/devops-info-service:<x>.<y>.<z> 
+```
+
+To pull the latest version, execute:
+
+```bash
+docker pull controlw/devops-info-service:latest
 ```
