@@ -62,7 +62,7 @@ jobs:
           tags: controlw/devops-info-service:${{ steps.version.outputs.VERSION }}
 
       - name: Scan the image with Snyk
-        uses: snyk/actions/docker@v3
+        uses: snyk/actions/docker@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
