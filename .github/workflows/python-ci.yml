@@ -64,7 +64,35 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push image
+            - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: app_python
+          load: true
+          build-args: |
+            MAJOR_VERSION=${{ steps.version.outputs.MAJOR_VERSION }}
+            MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }}
+            PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
+          tags: controlw/devops-info-service:${{ steps.version.outputs.VERSION }}
+
+      - name: Scan container with Snyk
+        uses: snyk/actions/docker@v3
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: controlw/devops-info-service:${{ steps.version.outputs.VERSION }}
+          args: >-
+            --severity-threshold=medium
+            --fail-on=upgradable
+
+      - name: Push image
         uses: docker/build-push-action@v6
         with:
           context: app_python
@@ -73,6 +101,7 @@ jobs:
             MAJOR_VERSION=${{ steps.version.outputs.MAJOR_VERSION }}
             MINOR_VERSION=${{ steps.version.outputs.MINOR_VERSION }}
             PATCH_VERSION=${{ steps.version.outputs.PATCH_VERSION }}
-          tags: >
+          tags: |
             controlw/devops-info-service:${{ steps.version.outputs.VERSION }},
             controlw/devops-info-service:latest
+
