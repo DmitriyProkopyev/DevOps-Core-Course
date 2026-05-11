@@ -1,1 +1,7 @@
 test
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+pulumi/venv/
+Pulumi.*.yaml
