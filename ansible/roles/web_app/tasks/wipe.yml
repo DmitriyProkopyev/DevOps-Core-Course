@@ -1,0 +1,37 @@
+---
+- name: Wipe web application
+  block:
+    - name: Stop and remove containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Remove docker-compose.yml file
+      ansible.builtin.file:
+        path: "{{ compose_file }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Remove application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Optionally remove Docker images (disk cleanup)
+      community.docker.docker_image:
+        name: "{{ docker_image }}:{{ docker_tag }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Log wipe completion
+      ansible.builtin.lineinfile:
+        path: /tmp/web_app_wipe.log
+        line: "{{ ansible_date_time.iso8601 }} - {{ app_name }} wiped from {{ inventory_hostname }} by {{ ansible_user }}"
+        create: true
+
+  when: web_app_wipe | bool
+  tags: 
+    - web_app_wipe
+  become: true
