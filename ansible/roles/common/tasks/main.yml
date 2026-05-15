@@ -1,22 +1,51 @@
 ---
-- name: Ensure apt cache is up to date
-  become: true
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 3600
+- name: common role tasks
+  tags: common
+  block:
+    - name: Ensure apt cache is up to date
+      block:
+        - name: Update apt cache
+          ansible.builtin.apt:
+            update_cache: true
+            cache_valid_time: 3600
 
-- name: Install common packages
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python3-pip
-      - curl
-      - git
-      - vim
-      - htop
-    state: present
+        - name: Install common packages
+          ansible.builtin.apt:
+            name:
+              - python3-pip
+              - curl
+              - git
+              - vim
+              - htop
+            state: present
+      tags: packages
+      rescue:
+        - name: Fix missing apt packages on cache update failure
+          ansible.builtin.command: apt-get update --fix-missing
+          register: fix_result
+        - name: Report apt fix outcome
+          ansible.builtin.debug:
+            msg: "Apt cache fixed: {{ fix_result.rc == 0 }}"
 
-- name: Set system timezone
+    - name: Manage common users
+      block:
+        - name: Add ubuntu user to sudo group
+          ansible.builtin.user:
+            name: ubuntu
+            groups: sudo
+            append: yes
+      tags: users
+
+    - name: Set system timezone
+      block:
+        - name: Set system timezone
+          ansible.builtin.timezone:
+            name: Europe/Moscow
+  
   become: true
-  ansible.builtin.timezone:
-    name: Europe/Moscow
+  always:
+    - name: Log common role completion
+      ansible.builtin.lineinfile:
+        path: /tmp/common_role_complete.log
+        line: "{{ ansible_date_time.iso8601 }} - common role completed on {{ inventory_hostname }}"
+        create: true
