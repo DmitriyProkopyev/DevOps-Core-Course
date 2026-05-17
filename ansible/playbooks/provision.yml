@@ -6,3 +6,4 @@
   roles:
     - ../roles/common
     - ../roles/docker
+    - ../roles/web_app
