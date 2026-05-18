@@ -2,7 +2,7 @@ import os
 import uvicorn
 
 from app_stats import AppStats
-from app_logging import log_request, log_error
+from observability import Observer
 from datetime import datetime, timezone
 from typing import Any
 from fastapi import FastAPI, Request, Response
@@ -18,6 +18,7 @@ app_stats = AppStats(name="devops-info-service",
                      major_version=major_version,
                      minor_version=minor_version,
                      patch_version=patch_version)
+observer = Observer(app_stats)
 
 
 @app.get("/", description="Service information")
@@ -44,6 +45,7 @@ async def root(request: Request):
         "endpoints": endpoints_info
     }
 
+
 @app.get("/health", description="Health check")
 async def check_health():
     return {
@@ -52,24 +54,34 @@ async def check_health():
         'uptime_seconds': int(app_stats.get_uptime())
     }
 
+
 @app.get("/trigger_error", description="Debugging endpoint to trigger intentional errors")
 async def trigger_error():
     raise Exception("You triggered an intentional error!")
 
+
+@app.get("/metrics")
+async def metrics():
+    return observer.snapshot_current_metrics()
+
+
 @app.exception_handler(Exception)
 async def handle_general_exception(request: Request, exception: Exception):
-    log_error(request)
+    observer.record_error(request)
     return JSONResponse(
         status_code=500,
         content={"error": "Internal Server Error"}
     )
 
+
 @app.middleware("http")
 async def log_request_middleware(request: Request, call_next):
+    observer.record_request_start(request.url.path)
     call_time = datetime.now(timezone.utc)
     response: Response = await call_next(request)
-    execution_time = datetime.now(timezone.utc) - call_time
-    log_request(request, response, execution_time)
+    execution_time = (datetime.now(timezone.utc) - call_time).total_seconds()
+    observer.record_request(request, response, execution_time)
+    observer.record_request_end(request.url.path)
     return response
 
 

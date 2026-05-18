@@ -62,9 +62,26 @@ services:
       - monitoring
     restart: unless-stopped
 
+  prometheus:
+    image: prom/prometheus:v3.9.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - logging
+      - monitoring
+    restart: unless-stopped
+
 volumes:
   loki-data:
   grafana-data:
+  prometheus-data:
 
 networks:
   monitoring:
