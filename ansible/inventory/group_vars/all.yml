@@ -1,0 +1,31 @@
+---
+app_name: devops-info-service
+docker_image: controlw/devops-info-service
+docker_tag: latest
+app_port: 5000
+app_internal_port: 5000
+
+compose_project_dir: "/opt/{{ app_name }}"
+docker_compose_version: "3.8"
+docker_user: "{{ ansible_user | default('ubuntu') }}"
+
+healthcheck:
+  test: ["CMD", "python", "/app/healthcheck.py"]
+  interval: 30s
+  timeout: 5s
+  start_period: 10s
+  retries: 3
+
+env_file: version.env
+
+app_secret_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          39616531373930363364306634303266326663656235613535313735636634383638323865333436
+          6334393731333631356561653739656164333735613333660a343539313063383235616166363130
+          36333565666432353965623963343462353663613132653531326633616162333030313563363766
+          6462336430383061350a393365306265366263323064336265303435656561316666306536373939
+          30313565363732643833336261643435366139326161333066366136353863323963
+
+app_dir: "{{ compose_project_dir }}"
+compose_file: "{{ app_dir }}/docker-compose.yml"
+web_app_wipe: false
