@@ -1,0 +1,15 @@
+services:
+  {{ app_name | default('devops-app') }}:
+    image: {{ docker_image }}:{{ docker_tag | default('latest') }}
+    container_name: {{ app_name | default('devops-app') }}
+    ports:
+      - "{{ app_port | default('8000') }}:{{ app_internal_port | default('8000') }}"
+    env_file:
+      - {{ env_file }}
+    healthcheck:
+      test: {{ healthcheck.test }}
+      interval: {{ healthcheck.interval | default('30s') }}
+      timeout: {{ healthcheck.timeout | default('5s') }}
+      start_period: {{ healthcheck.start_period | default('10s') }}
+      retries: {{ healthcheck.retries | default(3) }}
+    restart: {{ restart_policy | default('unless-stopped') }}

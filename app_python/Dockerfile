@@ -23,7 +23,7 @@ RUN useradd --create-home appuser && \
 COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-COPY --chown=appuser:appuser app.py app_stats.py healthcheck.py /app
+COPY --chown=appuser:appuser app.py app_stats.py observability.py healthcheck.py /app
 
 USER appuser
 
