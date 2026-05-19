@@ -60,7 +60,7 @@ async def trigger_error():
     raise Exception("You triggered an intentional error!")
 
 
-@app.get("/metrics")
+@app.get("/metrics", description="Prometheus metrics endpoint for standard and custom observability")
 async def metrics():
     return observer.snapshot_current_metrics()
 
