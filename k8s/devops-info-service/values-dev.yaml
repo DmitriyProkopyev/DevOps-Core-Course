@@ -1,0 +1,28 @@
+version:
+  major: 1
+  minor: 1
+  patch: 0
+replicas: 1
+image:
+  repository: controlw/devops-info-service
+  tag: latest
+resources:
+  minimum:
+    ram: "128Mi"
+    disk: "256Mi"
+  maximum:
+    ram: "512Mi"
+    disk: "1024Mi"
+service:
+  type: NodePort
+ports:
+  internal: 8000
+  external: 30081
+  container: 5000
+probes:
+  liveness:
+    endpoint: /health
+    period: 5
+  readiness:
+    endpoint: /health
+    period: 7

@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devops-info-service
+  name: {{ .Release.Name }}
   labels:
-    app: devops-info-service
+    app: {{ .Release.Name }}
     organization: controlw
 spec:
-  replicas: 3
+  replicas: {{ .Values.replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,11 +14,11 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: devops-info-service
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: devops-info-service
+        app: {{ .Release.Name }}
         organization: controlw
     spec:
       securityContext:
@@ -27,23 +27,23 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        - name: devops-info-service
-          image: controlw/devops-info-service:latest
+        - name: {{ .Release.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: Always
           ports:
             - name: http
-              containerPort: 5000
+              containerPort: {{ .Values.ports.container }}
               protocol: TCP
           envFrom:
             - configMapRef:
                 name: version-env
           resources:
             requests:
-              memory: "128Mi"
-              ephemeral-storage: "256Mi"
+              memory: {{ .Values.resources.minimum.ram }}
+              ephemeral-storage: {{ .Values.resources.minimum.disk }}
             limits:
-              memory: "256Mi"
-              ephemeral-storage: "512Mi"
+              memory: {{ .Values.resources.maximum.ram }}
+              ephemeral-storage: {{ .Values.resources.maximum.disk }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -52,17 +52,17 @@ spec:
                 - ALL
           readinessProbe:
             httpGet:
-              path: /health
-              port: 5000
+              path: {{ .Values.probes.readiness.endpoint }}
+              port: {{ .Values.ports.container }}
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: {{ .Values.probes.readiness.period }}
             timeoutSeconds: 4
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /health
-              port: 5000
+              path: {{ .Values.probes.liveness.endpoint }}
+              port: {{ .Values.ports.container }}
             initialDelaySeconds: 15
-            periodSeconds: 20
+            periodSeconds: {{ .Values.probes.liveness.period }}
             timeoutSeconds: 4
             failureThreshold: 3

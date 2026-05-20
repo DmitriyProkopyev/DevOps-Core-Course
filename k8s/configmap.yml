@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: version-env
-data:
-  MAJOR_VERSION: "1"
-  MINOR_VERSION: "1"
-  PATCH_VERSION: "0"
