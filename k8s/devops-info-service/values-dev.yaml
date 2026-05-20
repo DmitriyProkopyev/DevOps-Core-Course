@@ -30,6 +30,7 @@ secret:
   name: credentials
   username: admin
   password: supersecretpassword
-serviceAccount:
-  create: true
-  name: myapp-sa
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: standard

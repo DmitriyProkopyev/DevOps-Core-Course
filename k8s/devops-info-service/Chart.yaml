@@ -3,4 +3,4 @@ name: devops-info-service
 description: Helm chart for deploying devops-info-service via Kubernetes
 type: application
 version: 0.1.0
-appVersion: "1.1.0"
+appVersion: "1.2.0"
