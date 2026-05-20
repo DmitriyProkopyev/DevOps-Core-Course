@@ -4,9 +4,14 @@ import uvicorn
 from app_stats import AppStats
 from observability import Observer
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
+
+
+VISITS_PATH = Path("/data/visits.txt")
+VISITS_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 app = FastAPI()
@@ -21,8 +26,22 @@ app_stats = AppStats(name="devops-info-service",
 observer = Observer(app_stats)
 
 
+def read_visits():
+    try:
+        return int(VISITS_PATH.read_text().strip())
+    except (FileNotFoundError, ValueError):
+        return 0
+
+
+def increment_visits():
+    value = read_visits() + 1
+    VISITS_PATH.write_text(f"{value}\n")
+
+
 @app.get("/", description="Service information")
 async def root(request: Request):
+    increment_visits()
+
     request_info = {
         "client_ip": request.client.host,
         "user_agent": request.headers.get('user-agent'),
@@ -63,6 +82,13 @@ async def trigger_error():
 @app.get("/metrics", description="Prometheus metrics endpoint for standard and custom observability")
 async def metrics():
     return observer.snapshot_current_metrics()
+
+
+@app.get("/visits", description="An endpoint that returns the number of root endpoint calls")
+async def visits():
+    return {
+        "visits": read_visits()
+    }
 
 
 @app.exception_handler(Exception)

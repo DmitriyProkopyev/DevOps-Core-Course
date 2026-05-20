@@ -5,7 +5,7 @@ version:
 replicas: 3
 image:
   repository: controlw/devops-info-service
-  tag: 1.1.0
+  tag: latest
 resources:
   minimum:
     ram: "128Mi"
@@ -30,6 +30,7 @@ secret:
   name: credentials
   username: admin
   password: anothersupersecretpassword
-serviceAccount:
-  create: true
-  name: myapp-sa
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: standard

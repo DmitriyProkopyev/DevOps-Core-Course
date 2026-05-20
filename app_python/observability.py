@@ -74,7 +74,8 @@ class Observer:
             "/": list(),
             "/health": list(),
             "/trigger_error": list(),
-            "/metrics": list()
+            "/metrics": list(),
+            "/visits": list()
         }
 
     def record_error(self, request: Request):
