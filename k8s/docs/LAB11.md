@@ -19,3 +19,13 @@ Encryption of `etcd` is a protective measure to reinforce cluster security. The 
 
 **Secret exec verification:**
 ![Secret exec verification](secret_exec_verification.png)
+
+## Task 3
+
+Vault setup.
+
+**Vault internal setup:**
+![Vault internal setup](vault_internal_setup.png)
+
+**Extraction step**:
+![Extraction step](extraction_step.png)

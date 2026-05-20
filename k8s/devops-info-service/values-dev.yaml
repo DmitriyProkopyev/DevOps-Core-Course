@@ -30,3 +30,6 @@ secret:
   name: credentials
   username: admin
   password: supersecretpassword
+serviceAccount:
+  create: true
+  name: myapp-sa
