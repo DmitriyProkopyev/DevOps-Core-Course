@@ -26,3 +26,10 @@ probes:
   readiness:
     endpoint: /health
     period: 7
+secret:
+  name: credentials
+  username: admin
+  password: supersecretpassword
+serviceAccount:
+  create: true
+  name: myapp-sa

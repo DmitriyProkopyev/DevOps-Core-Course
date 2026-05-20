@@ -20,7 +20,12 @@ spec:
       labels:
         app: {{ .Release.Name }}
         organization: controlw
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "myapp-role"
+        vault.hashicorp.com/agent-inject-secret-credentials.txt: "secret/data/myapp"
     spec:
+      serviceAccountName: myapp-sa
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -37,6 +42,17 @@ spec:
           envFrom:
             - configMapRef:
                 name: version-env
+          env:
+            - name: APP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: username
+            - name: APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: password
           resources:
             requests:
               memory: {{ .Values.resources.minimum.ram }}
