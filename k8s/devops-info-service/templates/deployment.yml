@@ -37,6 +37,17 @@ spec:
           envFrom:
             - configMapRef:
                 name: version-env
+          env:
+            - name: APP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: username
+            - name: APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: password
           resources:
             requests:
               memory: {{ .Values.resources.minimum.ram }}
