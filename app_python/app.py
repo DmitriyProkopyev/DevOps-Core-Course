@@ -1,41 +1,24 @@
-import logging
 import os
-import sys
+import uvicorn
 
 from app_stats import AppStats
+from observability import Observer
 from datetime import datetime, timezone
-from pythonjsonlogger import json
 from typing import Any
-
-import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 
 
 app = FastAPI()
-app_logger = logging.getLogger("app")
-
 major_version = int(os.environ.get("MAJOR_VERSION", 1))
 minor_version = int(os.environ.get("MINOR_VERSION", 0))
 patch_version = int(os.environ.get("PATCH_VERSION", 0))
-
-if not app_logger.handlers:
-    handler = logging.StreamHandler(sys.stdout)
-    formatter = json.JsonFormatter(reserved_attrs=[], timestamp=True)
-    handler.setFormatter(formatter)
-    app_logger.addHandler(handler)
-
-request_logger = logging.getLogger("app.request")
-error_logger = logging.getLogger("app.error")
-
-request_logger.setLevel(level=logging.INFO)
-error_logger.setLevel(level=logging.ERROR)
-
 app_stats = AppStats(name="devops-info-service",
                      description="DevOps course info service",
                      major_version=major_version,
                      minor_version=minor_version,
                      patch_version=patch_version)
+observer = Observer(app_stats)
 
 
 @app.get("/", description="Service information")
@@ -62,6 +45,7 @@ async def root(request: Request):
         "endpoints": endpoints_info
     }
 
+
 @app.get("/health", description="Health check")
 async def check_health():
     return {
@@ -70,34 +54,34 @@ async def check_health():
         'uptime_seconds': int(app_stats.get_uptime())
     }
 
+
+@app.get("/trigger_error", description="Debugging endpoint to trigger intentional errors")
+async def trigger_error():
+    raise Exception("You triggered an intentional error!")
+
+
+@app.get("/metrics", description="Prometheus metrics endpoint for standard and custom observability")
+async def metrics():
+    return observer.snapshot_current_metrics()
+
+
 @app.exception_handler(Exception)
 async def handle_general_exception(request: Request, exception: Exception):
-    error_logger.error(
-        "Unhandled exception occured in a request",
-        extra={
-            "path": request.url.path,
-            "method": request.method
-        },
-        exc_info=True)
-
+    observer.record_error(request)
     return JSONResponse(
         status_code=500,
         content={"error": "Internal Server Error"}
     )
 
+
 @app.middleware("http")
-async def log_request(request: Request, call_next):
+async def log_request_middleware(request: Request, call_next):
+    observer.record_request_start(request.url.path)
     call_time = datetime.now(timezone.utc)
     response: Response = await call_next(request)
-    execution_time = datetime.now(timezone.utc) - call_time
-    request_logger.info(
-        "New request was processed",
-        extra={
-            "path": request.url.path,
-            "method": request.method,
-            "execution_time": execution_time,
-            "status_code": response.status_code
-        })
+    execution_time = (datetime.now(timezone.utc) - call_time).total_seconds()
+    observer.record_request(request, response, execution_time)
+    observer.record_request_end(request.url.path)
     return response
 
 
