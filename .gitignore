@@ -5,3 +5,4 @@ test
 terraform.tfvars
 pulumi/venv/
 Pulumi.*.yaml
+app_python/data

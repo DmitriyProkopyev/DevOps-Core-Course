@@ -1,0 +1,16 @@
+services:
+  devops-info-service:
+    image: controlw/devops-info-service:latest
+    ports:
+      - "5000:5000"
+    env_file:
+      - version.env
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "/app/healthcheck.py"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    restart: unless-stopped

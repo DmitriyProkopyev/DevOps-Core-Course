@@ -3,6 +3,7 @@
 ## Overview
 
 This service provides realtime application, system, and networking data relevant for training in DevOps practices. The data includes app specifics, OS specifics, runtime stats, request data, and available endpoints listing.
+The application tracks the number of root calls in a persistent manner.
 
 
 ## Prerequisites
