@@ -1,0 +1,58 @@
+# Run as a single process with all components
+target: all
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+
+common:
+  path_prefix: /loki
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: memberlist
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+
+memberlist:
+  join_members: []
+  bind_port: 7946
+
+schema_config:
+  configs:
+    - from: "2026-05-15"
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  tsdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/index_cache
+  filesystem:
+    directory: /loki/chunks
+
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  delete_request_store: filesystem
+
+limits_config:
+  retention_period: 168h
+  allow_structured_metadata: true
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules-tmp

@@ -1,0 +1,67 @@
+---
+- name: Include wipe tasks
+  include_tasks: wipe.yml
+  tags:
+    - web_app_wipe
+
+- name: Deploy application with Docker Compose
+  block:
+    - name: Create app directory
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}
+        state: directory
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: '0755'
+
+    - name: Template docker-compose file
+      ansible.builtin.template:
+        src: ../templates/docker-compose.yml.j2
+        dest: /opt/{{ app_name }}/docker-compose.yml
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: '0644'
+      vars:
+        app_name: devops-info-service
+        docker_image: controlw/devops-info-service
+        docker_tag: latest
+        app_port: 5000
+        app_internal_port: 5000
+        env_file: version.env
+        healthcheck:
+          test: ["CMD", "python", "/app/healthcheck.py"]
+          interval: 30s
+          timeout: 5s
+          start_period: 10s
+          retries: 3
+
+    - name: Copy version.env to project directory
+      become: true
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../app_python/version.env"
+        dest: /opt/devops-info-service/version.env
+        mode: '0600'
+
+    - name: Deploy with docker-compose
+      community.docker.docker_compose_v2:
+        project_src: /opt/{{ app_name }}
+        state: present
+        recreate: always
+        pull: always
+      register: compose_result
+  when: not web_app_wipe | bool
+  tags:
+    - web_app_wipe
+
+  rescue:
+    - name: Log deployment error
+      ansible.builtin.lineinfile:
+        path: /opt/{{ app_name }}/deploy_error.log
+        line: "{{ ansible_date_time.iso8601 }} - Deployment failed: {{ ansible_failed_result.msg }}"
+        create: true
+
+    - name: Stop services on failure (rollback)
+      community.docker.docker_compose_v2:
+        project_src: /opt/{{ app_name }}
+        state: absent
+      ignore_errors: true
