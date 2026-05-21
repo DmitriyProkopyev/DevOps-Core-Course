@@ -16,3 +16,13 @@
 
 **ArgoCD initial sync:**
 ![ArgoCD initial sync](argocd_initial_sync.png)
+
+**ArgoCD out of sync after change:**
+![argocd_out_of_sync](argocd_out_of_sync.png)
+
+**ArgoCD resynced::**
+![ArgoCD resynced](argocd_resynced.png)
+
+## Task 3
+
+
