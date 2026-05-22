@@ -24,3 +24,6 @@ In a Rollout, the important extra part is `spec.strategy`, especially canary or 
 
 **Blue-Green deployment:**
 ![Blue-Green deployment](blue_green_deployment.png)
+
+**Blue-Green deployment done:**
+![Blue-Green deployment done](blue_green_deployment_done.png)
