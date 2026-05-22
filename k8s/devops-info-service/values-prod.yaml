@@ -34,3 +34,6 @@ persistence:
   enabled: true
   size: 100Mi
   storageClass: standard
+persistentVolume:
+  storageClass: standard
+  size: "1Gi"

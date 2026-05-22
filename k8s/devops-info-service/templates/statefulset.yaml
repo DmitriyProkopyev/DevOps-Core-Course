@@ -75,9 +75,10 @@ spec:
     - metadata:
         name: app-data
         annotations:
-          volume.beta.kubernetes.io/storage-class: "{{ .Values.persistentVolume.storageClass | default \"\" }}"
+          volume.beta.kubernetes.io/storage-class: "{{ .Values.persistentVolume.storageClass}}"
       spec:
         accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
         resources:
           requests:
             storage: {{ .Values.persistentVolume.size | default "1Gi" }}

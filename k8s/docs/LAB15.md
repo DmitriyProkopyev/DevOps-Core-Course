@@ -25,3 +25,13 @@ A headless Service is a Service with `clusterIP: None`. It does not have a virtu
 > How does DNS works with StatefulSets?
 
 A StatefulSet typically references a headless service using the `serviceName` field. Kubernetes then gives each pod a predictable DNS name. That stable naming enables peers to find each other reliably after restarts or rescheduling.
+
+## Task 2
+
+**StatefulSets proof:**
+![StatefulSets proof](stateful_sets_proof.png)
+
+## Task 3
+
+**Persistence proof stateful sets:**
+![Persistence proof stateful sets](persistence_proof_stateful_sets.png)
