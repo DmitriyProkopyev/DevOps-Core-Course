@@ -1,11 +1,11 @@
 version:
   major: 1
-  minor: 1
-  patch: 0
+  minor: 2
+  patch: 1
 replicas: 2
 image:
   repository: controlw/devops-info-service
-  tag: latest
+  tag: 1.2.0
 resources:
   minimum:
     ram: "128Mi"

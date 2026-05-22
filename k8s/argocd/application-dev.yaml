@@ -7,14 +7,14 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/DmitriyProkopyev/DevOps-Core-Course.git'
-    targetRevision: lab13
+    targetRevision: lab14
     path: k8s/devops-info-service
     helm:
       valueFiles:
         - values-dev.yaml
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: dev
+    namespace: devops-info-service
   syncPolicy:
     automated:
       prune: true
