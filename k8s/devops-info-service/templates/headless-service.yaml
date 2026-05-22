@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-headless
+  labels:
+    app: {{ .Release.Name }}
+    organization: controlw
+spec:
+  clusterIP: None
+  selector:
+    app: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: {{ .Values.ports.service | default .Values.ports.container }}
+      targetPort: {{ .Values.ports.container }}

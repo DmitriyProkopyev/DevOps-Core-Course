@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    organization: controlw
+spec:
+  serviceName: {{ .Release.Name }}-headless
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        organization: controlw
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: app-config
+          configMap:
+            name: {{ .Release.Name }}-config
+      containers:
+        - name: {{ .Release.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: {{ .Values.ports.container }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: version-env
+          volumeMounts:
+            - name: app-config
+              mountPath: /config/config.json
+              subPath: config.json
+            - name: app-data
+              mountPath: /data
+          resources:
+            requests:
+              memory: {{ .Values.resources.minimum.ram }}
+              ephemeral-storage: {{ .Values.resources.minimum.disk }}
+            limits:
+              memory: {{ .Values.resources.maximum.ram }}
+              ephemeral-storage: {{ .Values.resources.maximum.disk }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.endpoint }}
+              port: {{ .Values.ports.container }}
+            initialDelaySeconds: 5
+            periodSeconds: {{ .Values.probes.readiness.period }}
+            timeoutSeconds: 4
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.endpoint }}
+              port: {{ .Values.ports.container }}
+            initialDelaySeconds: 15
+            periodSeconds: {{ .Values.probes.liveness.period }}
+            timeoutSeconds: 4
+            failureThreshold: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: app-data
+        annotations:
+          volume.beta.kubernetes.io/storage-class: "{{ .Values.persistentVolume.storageClass | default \"\" }}"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.persistentVolume.size | default "1Gi" }}
