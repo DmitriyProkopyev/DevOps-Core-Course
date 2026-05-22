@@ -1,0 +1,39 @@
+version:
+  major: 1
+  minor: 2
+  patch: 1
+replicas: 2
+image:
+  repository: controlw/devops-info-service
+  tag: 1.2.0
+resources:
+  minimum:
+    ram: "128Mi"
+    disk: "256Mi"
+  maximum:
+    ram: "512Mi"
+    disk: "1024Mi"
+service:
+  type: NodePort
+ports:
+  internal: 8000
+  external: 30081
+  container: 5000
+probes:
+  liveness:
+    endpoint: /health
+    period: 5
+  readiness:
+    endpoint: /health
+    period: 7
+secret:
+  name: credentials
+  username: admin
+  password: supersecretpassword
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: standard
+persistentVolume:
+  storageClass: standard
+  size: "1Gi"
