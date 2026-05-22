@@ -31,7 +31,7 @@ spec:
       initContainers:
         - name: init
           image: controlw/devops-info-service-init:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - name: shared-data
               mountPath: /shared

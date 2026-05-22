@@ -48,3 +48,8 @@ There are no active alerts.
 
 **Active alerts:**
 ![No alerts](no_alerts.png)
+
+## Task 3
+
+**Init container proof:**
+![Init container proof](init_container_proof.png)
