@@ -22,3 +22,5 @@ In a Rollout, the important extra part is `spec.strategy`, especially canary or 
 
 ## Task 3
 
+**Blue-Green deployment:**
+![Blue-Green deployment](blue_green_deployment.png)
