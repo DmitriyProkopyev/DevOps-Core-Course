@@ -26,6 +26,20 @@ spec:
         - name: app-config
           configMap:
             name: {{ .Release.Name }}-config
+        - name: shared-data
+          emptyDir: {}
+      initContainers:
+        - name: init
+          image: controlw/devops-info-service-init:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: shared-data
+              mountPath: /shared
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
       containers:
         - name: {{ .Release.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -43,6 +57,8 @@ spec:
               subPath: config.json
             - name: app-data
               mountPath: /data
+            - name: shared-data
+              mountPath: /shared
           resources:
             requests:
               memory: {{ .Values.resources.minimum.ram }}
